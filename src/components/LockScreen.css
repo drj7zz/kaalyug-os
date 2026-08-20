@@ -1,0 +1,326 @@
+/* =========================================
+   macOS-accurate Lock Screen
+   ========================================= */
+
+.lockscreen-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0;
+  cursor: default;
+  background: transparent;
+  z-index: 1;
+}
+
+/* The blurred wallpaper sits at the very back */
+.lockscreen-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/bg.jpeg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(32px) brightness(0.72);
+  transform: scale(1.08);
+  transform-origin: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.lockscreen-container.unlock-anim {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* ─── TOP STATUS BAR ─────────────────────────── */
+.ls-topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.ls-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.85;
+}
+
+/* ─── CLOCK SECTION (macOS: big, top-center) ─── */
+.ls-clock-section {
+  text-align: center;
+  margin-top: -40px;
+  animation: lsFadeInDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  user-select: none;
+  position: relative;
+  z-index: 1;
+}
+
+.ls-clock {
+  font-size: clamp(5rem, 12vw, 9rem);
+  font-weight: 300;
+  letter-spacing: -4px;
+  line-height: 1;
+  color: #ffffff;
+  font-family: inherit;
+  text-shadow: 0 2px 40px rgba(0,0,0,0.3);
+}
+
+.ls-date {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 6px;
+  letter-spacing: 0.2px;
+}
+
+/* ─── USER PROFILE SECTION (center) ──────────── */
+.ls-user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: lsFadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.1s;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Avatar */
+.ls-avatar-ring {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+  /* No border/outline — clean circle */
+}
+
+.ls-avatar-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 0.25s ease;
+  pointer-events: none;
+}
+
+.ls-avatar-ring.focused::after {
+  border-color: rgba(255, 255, 255, 0.50);
+}
+
+.ls-avatar-ring:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+.ls-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  transform: scale(1.25);
+  display: block;
+}
+
+/* Username */
+.ls-username {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: 0.1px;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+/* Password slide-in */
+.ls-password-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease;
+}
+
+.ls-password-section.visible {
+  max-height: 120px;
+  opacity: 1;
+}
+
+.ls-password-field {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 30px;
+  padding: 0 6px 0 16px;
+  height: 38px;
+  width: 220px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ls-password-field:focus-within {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.ls-password-field.shake {
+  animation: lsShake 0.4s ease;
+}
+
+.ls-password-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  letter-spacing: 2px;
+}
+
+.ls-password-input::placeholder {
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
+
+.ls-password-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.ls-password-btn:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+.ls-skip-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 12px;
+  transition: color 0.15s ease, background 0.15s ease;
+  letter-spacing: 0.2px;
+}
+
+.ls-skip-btn:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Click hint */
+.ls-click-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+  animation: lsPulse 2.5s ease-in-out infinite;
+  user-select: none;
+}
+
+/* ─── BOTTOM BAR ─────────────────────────────── */
+.ls-bottom-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  box-sizing: border-box;
+  gap: 24px;
+}
+
+.ls-bottom-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 5px 14px;
+  border-radius: 14px;
+  transition: color 0.15s ease, background 0.15s ease;
+  letter-spacing: 0.3px;
+}
+
+.ls-bottom-btn:hover {
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.1);
+}
+
+/* ─── ANIMATIONS ─────────────────────────────── */
+@keyframes lsFadeInDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lsFadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lsShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(4px); }
+}
+
+@keyframes lsPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.85; }
+}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 480px) {
+  .ls-clock {
+    font-size: 5rem;
+    letter-spacing: -3px;
+  }
+  .ls-date {
+    font-size: 1rem;
+  }
+  .ls-avatar-ring {
+    width: 90px;
+    height: 90px;
+  }
+  .ls-password-field {
+    width: 180px;
+  }
+}

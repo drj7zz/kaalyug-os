@@ -1,0 +1,282 @@
+.desktop-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.4s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Menu Bar */
+.menu-bar {
+  height: 28px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  font-size: 13px;
+  z-index: 9999;
+  background: var(--glass-header);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+
+.menu-left, .menu-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.apple-logo-img {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.apple-logo-img:hover {
+  transform: scale(1.1);
+}
+
+/* Navbar Menu Items: Clean scale, zero glow, zero heavy background box */
+.menu-item {
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  user-select: none;
+  background: transparent !important;
+  text-shadow: none !important;
+}
+
+.menu-item:hover {
+  background: transparent !important;
+  transform: translateY(-1px);
+  opacity: 0.9;
+  text-shadow: none !important;
+}
+
+.fw-bold {
+  font-weight: 600;
+}
+
+.menu-icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px;
+  transition: transform 0.15s ease;
+  background: transparent !important;
+}
+
+.menu-icon:hover {
+  background: transparent !important;
+  transform: scale(1.1);
+}
+
+.menu-time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Workspace */
+.workspace {
+  flex: 1;
+  position: relative;
+  padding: 20px;
+}
+
+/* Desktop Icons: Clean Icon Pop-up Effect without glow */
+.desktop-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100px;
+}
+
+.desktop-shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.shortcut-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.desktop-shortcut:hover .shortcut-icon-wrapper {
+  transform: scale(1.12) translateY(-2px);
+}
+
+.shortcut-title {
+  color: var(--shortcut-text, #ffffff);
+  font-size: 12px;
+  text-align: center;
+  font-weight: 600;
+  padding: 2px 4px;
+  transition: transform 0.2s ease;
+  background: transparent !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+.desktop-shortcut:hover .shortcut-title {
+  background: transparent !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85) !important;
+}
+
+.desktop-shortcut:active {
+  transform: scale(0.96);
+}
+
+/* Dock */
+.dock-container {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 9000;
+}
+
+.dock {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: var(--dock-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.dock-item:hover {
+  transform: scale(1.2) translateY(-8px);
+}
+
+.dock-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.dock-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  position: absolute;
+  bottom: -8px;
+}
+
+/* Spotlight Search */
+.spotlight-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass-bg);
+  z-index: 9500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 15vh;
+}
+
+.spotlight-container {
+  display: flex;
+  align-items: center;
+  width: 500px;
+  max-width: 90%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  gap: 12px;
+  background: var(--glass-header);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spotlight-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 20px;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .menu-bar {
+    font-size: 11px;
+    padding: 0 8px;
+  }
+  
+  .menu-item:not(.fw-bold):not(:nth-child(4)):not(:nth-child(5)) {
+    display: none;
+  }
+
+  .menu-time {
+    display: none;
+  }
+  
+  .dock {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  
+  .dock-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .dock-item:hover {
+    transform: scale(1.1) translateY(-5px);
+  }
+  
+  .spotlight-container {
+    width: 90%;
+  }
+}
