@@ -60,14 +60,28 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 /* ========== LAYOUT ========== */
 .os-container {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 /* ─── WALLPAPER ─────────────────────────────── */
@@ -77,6 +91,7 @@ body {
   background-image: url('/bg.jpeg');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   z-index: 0;
 }
 
@@ -88,8 +103,8 @@ body {
   background-image: url('/bg.jpeg');
   background-size: cover;
   background-position: center;
-  filter: blur(32px) brightness(0.72);
-  transform: scale(1.08);
+  filter: brightness(0.72);
+  transform: none;
   transform-origin: center;
   z-index: 0;
 }

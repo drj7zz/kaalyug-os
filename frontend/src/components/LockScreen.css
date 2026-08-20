@@ -11,13 +11,13 @@
 
 .lockscreen-container .lockscreen-bg {
   position: absolute;
-  inset: -48px;
+  inset: 0;
   z-index: -2;
   pointer-events: none;
   background-image: url('/bg.jpeg');
   background-position: center;
   background-size: cover;
-  filter: blur(26px) saturate(1.08) brightness(0.76);
+  filter: saturate(1.04) brightness(0.76);
 }
 
 .lockscreen-container::after {
@@ -99,11 +99,13 @@
 
 .ls-avatar-ring {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.38);
   cursor: pointer;
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
@@ -120,9 +122,13 @@
   display: block;
   width: 100%;
   height: 100%;
-  transform: scale(1.25);
+  max-width: none;
   object-fit: cover;
-  object-position: 50% 20%;
+  object-position: 50% 58%;
+  image-rendering: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .ls-username {
@@ -287,12 +293,25 @@
     padding: 15px 17px;
   }
 
+  .ls-topbar::before {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 96px;
+    height: 26px;
+    border-radius: 999px;
+    background: #050505;
+    content: '';
+    transform: translateX(-50%);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.08), 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
   .ls-topbar-right {
     gap: 11px;
   }
 
   .ls-clock-section {
-    top: clamp(74px, 13vh, 112px);
+    top: clamp(82px, 14vh, 118px);
   }
 
   .ls-clock {
@@ -309,8 +328,8 @@
   }
 
   .ls-avatar-ring {
-    width: 88px;
-    height: 88px;
+    width: 102px;
+    height: 102px;
   }
 
   .ls-bottom-bar {

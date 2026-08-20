@@ -70,6 +70,11 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
     return date.toLocaleTimeString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
+  const formatMobileTime = (date) => date.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+
   const closeApp = useCallback((appId) => {
     setOpenWindows(prev => prev.filter(w => w.id !== appId));
     setMinimizedWindows(prev => prev.filter(id => id !== appId));
@@ -105,6 +110,17 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
     <div className="desktop-container">
       {/* Menu Bar */}
       <div className="menu-bar glass-panel">
+        <div className="mobile-status-bar">
+          <span>{formatMobileTime(time)}</span>
+          <span className="dynamic-island" aria-label="Dynamic Island" />
+          <div>
+            <Wifi size={15} />
+            <Battery size={16} />
+            <button className="mobile-lock-button" onClick={onLock} aria-label="Lock screen" title="Lock screen">
+              <Lock size={15} />
+            </button>
+          </div>
+        </div>
         <div className="menu-left">
           <div className="apple-logo-img" title="Lock Screen" onClick={onLock}>
             <img src="/bg.jpeg" alt="Logo" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} />
@@ -142,6 +158,20 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
                 </div>
                 <span className="shortcut-title">{shortcut.title}</span>
               </div>
+            );
+          })}
+        </div>
+
+        <div className="mobile-app-grid">
+          {apps.map(app => {
+            const Icon = app.icon;
+            return (
+              <button key={app.id} className="mobile-app" onClick={() => openApp(app)}>
+                <span className="mobile-app-icon" style={{ backgroundColor: app.color }}>
+                  <Icon size={29} color="#fff" />
+                </span>
+                <span>{app.title === 'Basic Information' ? 'About Me' : app.title}</span>
+              </button>
             );
           })}
         </div>
@@ -184,7 +214,7 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
       </div>
 
       {/* Dock */}
-      <div className="dock-container">
+      <div className={`dock-container ${activeWindow ? 'app-active' : ''}`}>
         <div className="dock glass-panel">
           {apps.map(app => {
             const Icon = app.icon;

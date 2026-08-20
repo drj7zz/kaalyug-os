@@ -24,6 +24,8 @@ const GmailIcon = () => (
 
 const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, theme, setTheme }) => {
   const isMobile = window.innerWidth <= 768;
+  const desktopWidth = Math.min(640, window.innerWidth - 48);
+  const desktopHeight = Math.min(480, window.innerHeight - 76);
   const [isFullScreen, setIsFullScreen] = useState(isMobile);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, them
         return (
           <div className="portfolio-content profile-page">
             <div className="profile-header-card">
-              <img src="/drj.jpg" alt="Dirghraj Giri" className="profile-avatar-large" />
+              <img src="/drj1.jpg" alt="Dirghraj Giri" className="profile-avatar-large" loading="eager" decoding="sync" />
               <div className="profile-header-info">
                 <h1>Dirghraj Giri</h1>
                 <p className="subtitle">Frontend Developer from <b>Madhesh, Nepal</b></p>
@@ -299,13 +301,13 @@ const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, them
   return (
     <Rnd
       default={{
-        x: isMobile ? 0 : window.innerWidth / 2 - 320,
-        y: isMobile ? 28 : window.innerHeight / 2 - 240,
-        width: isMobile ? '100%' : 640,
-        height: isMobile ? 'calc(100% - 28px)' : 480,
+        x: isMobile ? 0 : Math.max(24, (window.innerWidth - desktopWidth) / 2),
+        y: isMobile ? 0 : Math.max(12, (window.innerHeight - desktopHeight) / 2),
+        width: isMobile ? '100%' : desktopWidth,
+        height: isMobile ? '100%' : desktopHeight,
       }}
-      size={isFullScreen ? { width: '100%', height: 'calc(100% - 28px)' } : undefined}
-      position={isFullScreen ? { x: 0, y: 28 } : undefined}
+      size={isFullScreen ? { width: '100%', height: '100%' } : undefined}
+      position={isFullScreen ? { x: 0, y: 0 } : undefined}
       minWidth={320}
       minHeight={250}
       bounds=".workspace"

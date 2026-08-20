@@ -101,7 +101,7 @@ const LockScreen = ({ onUnlock, onOpenAppOnUnlock }) => {
           className={`ls-avatar-ring ${showPasswordField ? 'focused' : ''}`}
           onClick={(e) => { e.stopPropagation(); handleAvatarClick(); }}
         >
-          <img src="/drj.jpg" alt="Dirghraj Giri" className="ls-avatar-img" />
+          <img src="/drj1.jpg" alt="Dirghraj Giri" className="ls-avatar-img" loading="eager" decoding="sync" fetchPriority="high" />
         </div>
 
         <div className="ls-username">Dirghraj Giri</div>

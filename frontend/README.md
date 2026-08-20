@@ -106,7 +106,7 @@ Vite prints the local development URL in the terminal, usually `http://localhost
 
 - Update portfolio content and external links in `src/components/Window.jsx`.
 - Add or change desktop applications in the `apps` collection in `src/components/Desktop.jsx`.
-- Replace `public/drj.jpg` and `public/bg.jpeg` with your profile photograph and wallpaper.
+- Replace `public/drj1.jpg` and `public/bg.jpeg` with your profile photograph and wallpaper.
 - Adjust color, glass, layout, and responsive styling in the matching CSS files under `src/`.
 - Update the metadata in `index.html` before deploying a personalized version.
 
