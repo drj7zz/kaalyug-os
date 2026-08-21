@@ -1,26 +1,35 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Desktop.css';
-import { Wifi, Battery, Search, User, Folder, FolderOpen, Files, Grid2X2, Briefcase, Mail, Settings, Lock, HelpCircle, Globe, Terminal, MessageSquare, MessageCircle, Sparkles, Bell, Info, BarChart3 } from 'lucide-react';
+import { Wifi, Battery, Search, User, Folder, FolderOpen, Files, Grid2X2, Briefcase, Mail, Settings, Lock, HelpCircle, Globe, Terminal, MessageSquare, MessageCircle, Sparkles, Bell, Info, BarChart3, Gamepad2, X, ChevronRight, ChevronLeft, Monitor } from 'lucide-react';
 import Window from './Window';
 
 const apps = [
   { id: 'basic_info', title: 'Basic Information', icon: User, color: '#34C759' },
   { id: 'projects', title: 'Projects', icon: Briefcase, color: '#007AFF' },
   { id: 'settings', title: 'Settings', icon: Settings, color: '#8E8E93' },
-  { id: 'support', title: 'Customer Care', icon: HelpCircle, color: '#FF3B30' }
-  ,{ id: 'browser', title: 'Browser', icon: Globe, color: '#0A84FF' }
-  ,{ id: 'terminal', title: 'Terminal', icon: Terminal, color: '#1C1C1E' }
-  ,{ id: 'finder', title: 'Finder', icon: Files, color: '#5AC8FA' }
-  ,{ id: 'applications', title: 'Applications', icon: Grid2X2, color: '#34C759' }
-  ,{ id: 'yug_ai', title: 'Yug AI', icon: Sparkles, color: '#AF52DE' }
-  ,{ id: 'messages', title: 'Messages', icon: MessageCircle, color: '#007AFF' }
-  ,{ id: 'analytics', title: 'GitHub Analytics', icon: BarChart3, color: '#30D158' }
+  { id: 'support', title: 'Customer Care', icon: HelpCircle, color: '#FF3B30' },
+  { id: 'browser', title: 'Browser', icon: Globe, color: '#0A84FF' },
+  { id: 'terminal', title: 'Terminal', icon: Terminal, color: '#1C1C1E' },
+  { id: 'finder', title: 'Finder', icon: Files, color: '#5AC8FA' },
+  { id: 'applications', title: 'Applications', icon: Grid2X2, color: '#34C759' },
+  { id: 'yug_ai', title: 'Yug AI', icon: Sparkles, color: '#AF52DE' },
+  { id: 'messages', title: 'Yug Chat', icon: MessageCircle, color: '#007AFF' },
+  { id: 'analytics', title: 'GitHub Analytics', icon: BarChart3, color: '#30D158' },
+  { id: 'snake', title: 'Snake', icon: Gamepad2, color: '#FF9500' },
 ];
 
 const desktopShortcuts = [
   { id: 'basic_info', title: 'Basic Info', icon: Folder },
   { id: 'projects', title: 'Projects', icon: Folder },
-  { id: 'support', title: 'Customer Care', icon: Folder }
+  { id: 'support', title: 'Customer Care', icon: Folder },
+];
+
+// Tutorial steps
+const tutorialSteps = [
+  { title: 'Welcome to Kaalyug OS', body: 'A macOS-inspired interactive portfolio operating system built by Dirghraj Giri. Navigate through apps, explore projects, and chat with AI.' },
+  { title: 'Applications', body: 'Basic Info — Learn about Dirghraj\nProjects — Browse all featured projects\nYug AI — AI assistant powered by Gemini\nYug Chat — Global chat with other visitors\nGitHub Analytics — Live stats from GitHub\nSnake — Classic snake game' },
+  { title: 'Navigation', body: 'Click apps in the dock to open/minimize them.\nUse the Applications grid to see all apps.\nSpotlight Search: press Ctrl/Cmd + K.\nLock Screen: press Ctrl/Cmd + L.\nFullscreen: click the green maximize button.' },
+  { title: 'Tips & Shortcuts', body: 'Double-click a window title bar to toggle fullscreen.\nDrag windows to reposition them.\nThe notification bell shows system alerts.\nThe Browser app opens any URL in an embedded frame.' },
 ];
 
 const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp }) => {
@@ -32,6 +41,13 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Kaalyug OS', body: 'Welcome to Kaalyug OS v1.0', time: 'Just now', iconType: 'os' },
+    { id: 2, title: 'Tip', body: 'Press Ctrl/Cmd + K to search apps', time: 'Just now', iconType: 'tip' },
+    { id: 3, title: 'Yug AI', body: 'Ask me about Dirghraj\'s projects and skills', time: 'Just now', iconType: 'ai' },
+  ]);
+  const [notifPermission, setNotifPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -89,10 +105,7 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
     return date.toLocaleTimeString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatMobileTime = (date) => date.toLocaleTimeString([], {
-    hour: 'numeric',
-    minute: '2-digit'
-  });
+  const formatMobileTime = (date) => date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
   const closeApp = useCallback((appId) => {
     setOpenWindows(prev => prev.filter(w => w.id !== appId));
@@ -105,26 +118,34 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
     if (!showSearch) setSearchQuery('');
   };
 
-  const searchableApps = apps.map(app => ({ ...app, keywords: ({ basic_info: 'about me dirghraj giri skills react javascript frontend madhesh nepal', projects: 'projects yugcoin wallet compliance financial tracker', contact: 'contact email github instagram', settings: 'settings themes appearance', support: 'support customer care help', browser: 'browser web internet', terminal: 'terminal commands shell', finder: 'applications app library', yug_ai: 'yug ai questions assistant' }[app.id] || app.title).toLowerCase() }));
+  const dismissNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const requestNotifPermission = async () => {
+    if (typeof Notification !== 'undefined') {
+      const result = await Notification.requestPermission();
+      setNotifPermission(result);
+      if (result === 'granted') {
+        new Notification('Kaalyug OS', { body: 'Notifications enabled! 🎉', icon: '/favicon.svg' });
+      }
+    }
+  };
+
+  const searchableApps = apps.map(app => ({ ...app, keywords: ({ basic_info: 'about me dirghraj giri skills react javascript frontend madhesh nepal', projects: 'projects yugcoin wallet compliance financial tracker raty ausadhi minichain focusquest', contact: 'contact email github instagram', settings: 'settings themes appearance', support: 'support customer care help', browser: 'browser web internet', terminal: 'terminal commands shell', finder: 'applications app library', yug_ai: 'yug ai questions assistant gemini', messages: 'yug chat global chat messages', analytics: 'github analytics stats repos', snake: 'snake game play arcade' }[app.id] || app.title).toLowerCase() }));
   const searchResults = searchableApps.filter(app => app.keywords.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleMenuClick = (menu) => {
     if (menu === 'View') {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.log(`Error attempting to enable fullscreen: ${err.message}`);
-        });
+        document.documentElement.requestFullscreen().catch(() => {});
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
+        document.exitFullscreen?.();
       }
     } else if (menu === 'Settings') {
-      const settingsApp = apps.find(a => a.id === 'settings');
-      openApp(settingsApp);
+      openApp(apps.find(a => a.id === 'settings'));
     } else if (menu === 'Customer Care') {
-      const supportApp = apps.find(a => a.id === 'support');
-      openApp(supportApp);
+      openApp(apps.find(a => a.id === 'support'));
     } else if (menu === 'Applications') {
       openApp(apps.find(a => a.id === 'applications'));
     }
@@ -152,7 +173,7 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
           <div className="apple-logo-img" title="Lock Screen" onClick={onLock}>
             <img src="/bg.jpeg" alt="Logo" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} />
           </div>
-          <span className="menu-item fw-bold">Kalyug OS</span>
+          <span className="menu-item fw-bold">Kaalyug OS</span>
           <span className="menu-item">File</span>
           <span className="menu-item">Edit</span>
           <span className="menu-item" onClick={() => handleMenuClick('View')}>View</span>
@@ -163,7 +184,7 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
         <div className="menu-right">
           <span className="menu-icon" onClick={toggleSearch} title="Search"><Search size={16} /></span>
           <span className="menu-icon" onClick={() => setShowNotifications(prev => !prev)} title="Notifications"><Bell size={15} /></span>
-          <span className="menu-icon" onClick={() => setShowTutorial(true)} title="How to use"><Info size={15} /></span>
+          <span className="menu-icon" onClick={() => { setShowTutorial(true); setTutorialStep(0); }} title="How to use"><Info size={15} /></span>
           <span className="menu-icon" onClick={onLock} title="Lock Screen"><Lock size={15} /></span>
           <span className="menu-icon"><Wifi size={16} /></span>
           <span className="menu-icon"><Battery size={16} /></span>
@@ -178,11 +199,7 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
             const Icon = shortcut.icon;
             const fullApp = apps.find(a => a.id === shortcut.id);
             return (
-              <div 
-                key={shortcut.id} 
-                className="desktop-shortcut" 
-                onClick={() => openApp(fullApp)}
-              >
+              <div key={shortcut.id} className="desktop-shortcut" onClick={() => openApp(fullApp)}>
                 <div className="shortcut-icon-wrapper">
                   <Icon size={48} color="#007AFF" fill="rgba(0,122,255,0.2)" />
                 </div>
@@ -208,9 +225,9 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
         </div>
 
         {openWindows.map(app => (
-          <Window 
-            key={app.id} 
-            app={app} 
+          <Window
+            key={app.id}
+            app={app}
             isActive={activeWindow === app.id}
             isMinimized={minimizedWindows.includes(app.id)}
             onFocus={() => {
@@ -233,22 +250,81 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
           <div className="spotlight-overlay" onClick={toggleSearch}>
             <div className="spotlight-container glass-panel" onClick={e => e.stopPropagation()}>
               <Search size={24} color="#888" />
-              <input 
-                type="text" 
-                placeholder="Search portfolio..." 
-                autoFocus 
+              <input
+                type="text"
+                placeholder="Search portfolio..."
+                autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchQuery && <div className="search-results">
                 {searchResults.length ? searchResults.map(app => { const Icon = app.icon; return <button key={app.id} onClick={() => { openApp(app); setShowSearch(false); }}><Icon size={18} /><span>{app.title}</span></button>; }) : <span className="search-empty">No applications found</span>}
-                <button className="web-search-result" onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank', 'noopener,noreferrer')}><Search size={18} /><span>Search the web for “{searchQuery}”</span></button>
+                <button className="web-search-result" onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank', 'noopener,noreferrer')}><Search size={18} /><span>Search the web for &quot;{searchQuery}&quot;</span></button>
               </div>}
             </div>
           </div>
         )}
-        {showNotifications && <div className="notification-center glass-panel"><b>Notifications</b><p>Welcome to Kaalyug OS.</p><p>Tip: press Ctrl/Cmd + K to search.</p><p>Open Yug AI to ask about the portfolio.</p></div>}
-        {showTutorial && <div className="tutorial-overlay" onClick={() => setShowTutorial(false)}><div className="tutorial-card glass-panel" onClick={e => e.stopPropagation()}><h2>Welcome to Kaalyug OS</h2><p>Open apps from the dock, use Applications to browse, and search with Ctrl/Cmd + K.</p><button onClick={() => setShowTutorial(false)}>Got it</button></div></div>}
+
+        {/* Notification Center */}
+        {showNotifications && (
+          <div className="notification-center glass-panel">
+            <div className="notif-header">
+              <b>Notifications</b>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                {notifications.length > 0 && <button className="notif-clear-all" onClick={() => setNotifications([])}>Clear All</button>}
+                <button className="notif-dismiss" style={{position:'static'}} onClick={() => setShowNotifications(false)} title="Close"><X size={13} /></button>
+              </div>
+            </div>
+            {notifPermission !== 'granted' && (
+              <div className="notif-permission-card">
+                <Bell size={18} />
+                <div>
+                  <b>Enable Notifications</b>
+                  <p>Get alerts from Kaalyug OS</p>
+                </div>
+                <button onClick={requestNotifPermission}>{notifPermission === 'denied' ? 'Blocked' : 'Allow'}</button>
+              </div>
+            )}
+            {notifications.length === 0 && <p className="notif-empty">No notifications</p>}
+            {notifications.map(n => (
+              <div key={n.id} className="notif-card">
+                <span className="notif-icon">{n.iconType === 'os' ? <Monitor size={16} /> : n.iconType === 'tip' ? <Info size={16} /> : <Sparkles size={16} />}</span>
+                <div className="notif-body">
+                  <b>{n.title}</b>
+                  <span>{n.body}</span>
+                  <small>{n.time}</small>
+                </div>
+                <button className="notif-dismiss" onClick={() => dismissNotification(n.id)}><X size={12} /></button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Tutorial Overlay */}
+        {showTutorial && (
+          <div className="tutorial-overlay" onClick={() => setShowTutorial(false)}>
+            <div className="tutorial-card glass-panel" onClick={e => e.stopPropagation()}>
+              <button className="tutorial-close" onClick={() => setShowTutorial(false)} title="Close"><X size={15} /></button>
+              <div className="tutorial-step-indicator">
+                {tutorialSteps.map((_, i) => (
+                  <span key={i} className={`tutorial-dot ${i === tutorialStep ? 'active' : ''}`} />
+                ))}
+              </div>
+              <h2>{tutorialSteps[tutorialStep].title}</h2>
+              <div className="tutorial-body">
+                {tutorialSteps[tutorialStep].body.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+              </div>
+              <div className="tutorial-actions">
+                {tutorialStep > 0 && <button className="tutorial-btn-secondary" onClick={() => setTutorialStep(s => s - 1)}><ChevronLeft size={14} /> Back</button>}
+                {tutorialStep < tutorialSteps.length - 1 ? (
+                  <button onClick={() => setTutorialStep(s => s + 1)}>Next <ChevronRight size={14} /></button>
+                ) : (
+                  <button onClick={() => setShowTutorial(false)}>Got it ✓</button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Dock */}
@@ -258,8 +334,8 @@ const Desktop = ({ theme, setTheme, onLock, initialAppToOpen, clearInitialApp })
             const Icon = app.icon;
             const isOpen = openWindows.find(w => w.id === app.id);
             return (
-              <div 
-                key={app.id} 
+              <div
+                key={app.id}
                 className={`dock-item ${['basic_info', 'projects', 'browser', 'terminal'].includes(app.id) ? 'mobile-essential' : 'mobile-optional'} ${isOpen ? 'is-open' : ''}`}
                 onClick={() => toggleApp(app)}
                 title={app.title}

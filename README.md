@@ -1,140 +1,235 @@
-# Kaalyug OS Portfolio
+<div align="center">
 
-An interactive, desktop-inspired personal portfolio for **Dirghraj Giri**, a frontend developer from Madhesh, Nepal. The experience turns a conventional portfolio into a small operating-system interface: visitors unlock the screen, open apps, move windows, explore projects, and get in touch.
+# 🖥️ Kaalyug OS
 
-## Highlights
+**An interactive, macOS-inspired portfolio operating system — built to be explored, not just read.**
 
-- Desktop-style interface with dock, shortcuts, menu bar, draggable windows, and window controls
-- Lock screen with live date/time and a frictionless portfolio unlock flow
-- Portfolio apps for profile information, projects, contact, support, and appearance settings
-- Dark, blue, and pink themes persisted in the browser with `localStorage`
-- Responsive full-screen window experience on mobile devices
-- Semantic metadata, Open Graph, Twitter Card, and structured Person data for discoverability
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white&style=flat-square)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white&style=flat-square)](https://vite.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white&style=flat-square)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47a248?logo=mongodb&logoColor=white&style=flat-square)](https://mongodb.com)
+[![Gemini AI](https://img.shields.io/badge/Gemini-AI-4285f4?logo=google&logoColor=white&style=flat-square)](https://ai.google.dev)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-000?logo=vercel&logoColor=white&style=flat-square)](https://vercel.com)
 
-## Technology
+> **By [Dirghraj Giri](https://github.com/drj7zz)** — BIT Student | Frontend Developer | Madhesh, Nepal 🇳🇵
 
-| Area | Tools |
-| --- | --- |
-| UI | React 19, JavaScript, CSS3 |
-| Build tooling | Vite 8 |
-| Window interaction | `react-rnd` |
-| Icons | `lucide-react` |
-| Quality checks | Oxlint |
+</div>
 
-## Architecture
+---
+
+## 📸 Two Views — One OS
+
+> Kaalyug OS automatically adapts to your device. It renders as a full **macOS desktop** on larger screens, and as a native **iOS-style home screen** on mobile.
+
+| macOS Desktop View | iOS Mobile View |
+|---|---|
+| Floating draggable windows | Bottom-sheet slide-up panels |
+| macOS menu bar + dock | iOS status bar + frosted dock |
+| Traffic-light window controls | Drag handle + swipe to dismiss |
+| Spotlight search (⌘K) | Full-screen app grid |
+
+---
+
+## ✨ Features
+
+| App | Description |
+|---|---|
+| 🤖 **Yug AI** | Gemini-powered AI with full portfolio context — ask anything |
+| 💬 **Yug Chat** | MongoDB-backed global chat — all visitors share one room |
+| 📊 **GitHub Analytics** | Live stat cards + repo browser from GitHub API |
+| 🐍 **Snake** | Canvas game — keyboard on desktop, swipe + d-pad on mobile |
+| 🔮 **Liquid Glass Lockscreen** | Animated blobs + frosted glass unlock, lockscreen-only Support |
+| 🔔 **Notification Center** | Dismissible cards + browser push permission request |
+| 📖 **Tutorial** | 4-step onboarding modal with progress indicators |
+| 🌐 **Browser** | Embedded iframe browser with external-open fallback |
+| 💻 **Terminal** | Fake shell with portfolio-specific commands |
+| 🗂️ **Finder** | Browse and launch all applications |
+| ⚙️ **Settings** | Dark / Blue / Pink themes + Kaalyug OS v1.0 info |
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
-flowchart TD
-    A[index.html] --> B[main.jsx]
-    B --> C[App.jsx]
-    C -->|locked| D[LockScreen]
-    C -->|unlocked| E[Desktop]
-    E --> F[Window]
-    E --> G[Dock and desktop shortcuts]
-    E --> H[Spotlight search UI]
-    C --> I[(localStorage)]
-    I --> J[Lock state]
-    I --> K[Selected theme]
-    F --> L[Profile]
-    F --> M[Projects]
-    F --> N[Contact]
-    F --> O[Support]
-    F --> P[Settings]
+graph TB
+    subgraph Client ["🌐 Client (Vercel CDN)"]
+        direction TB
+        LS["🔮 LockScreen\n──────────────\nLiquid glass blobs\nSupport overlay"]
+        DE["🖥️ Desktop\n──────────────\nMenu bar · Dock\nNotifications · Tutorial"]
+        WI["📦 Window\n──────────────\nAll app renderers\n12 apps total"]
+        LS -->|unlock| DE
+        DE -->|open app| WI
+    end
+
+    subgraph Backend ["⚙️ Backend (Render)"]
+        direction TB
+        EX["Express Server\nPort 10000"]
+        CH["/api/chat\nYug AI endpoint"]
+        MS["/api/messages\nYug Chat endpoint"]
+        EX --> CH
+        EX --> MS
+    end
+
+    subgraph Services ["🔌 External Services"]
+        GEM["✨ Google Gemini\ngemini-flash-latest"]
+        MON["🍃 MongoDB Atlas\nMessages collection"]
+        GH["🐙 GitHub API\nPublic · No auth"]
+    end
+
+    WI -->|"POST question"| CH
+    WI -->|"GET/POST"| MS
+    WI -->|"public fetch"| GH
+    CH -->|generateContent| GEM
+    MS <-->|read/write| MON
 ```
 
-## Visitor flow
+---
+
+## 🔄 User Flow
 
 ```mermaid
 flowchart LR
-    A[Open portfolio] --> B[Lock screen]
-    B --> C{Unlock action}
-    C -->|Click, Enter, or Touch ID| D[Desktop]
-    C -->|Help and Support| E[Unlock and open Support]
-    D --> F[Select shortcut or dock app]
-    F --> G[Open, focus, drag, resize, minimize, or close window]
-    G --> H{Settings opened?}
-    H -->|Yes| I[Choose theme and save preference]
-    H -->|No| F
+    A([Visit URL]) --> B{Device?}
+    B -->|Desktop| C[macOS View\nFloating windows]
+    B -->|Mobile| D[iOS View\nBottom sheets]
+
+    C --> E[LockScreen\nLiquid glass]
+    D --> E
+
+    E -->|Click / Enter| F[Desktop\nDock + Menu bar]
+    F --> G{Choose app}
+
+    G -->|Yug AI| H[Chat with\nGemini AI]
+    G -->|Yug Chat| I[Global chat\nMongoDB]
+    G -->|Analytics| J[GitHub\nLive stats]
+    G -->|Snake| K[Play game\nKeyboard or touch]
+    G -->|Other| L[Browse portfolio\ncontent]
+
+    H & I & J & K & L --> F
 ```
 
-## Project structure
+---
 
-```text
-frontend/
-├── public/                 # Wallpaper, profile image, favicon, and shared assets
-├── src/
-│   ├── components/
-│   │   ├── Desktop.jsx      # Desktop shell, dock, shortcuts, search, window state
-│   │   ├── LockScreen.jsx   # Lock/unlock interaction
-│   │   └── Window.jsx       # Draggable portfolio application windows
-│   ├── App.jsx              # Root state and lock/theme persistence
-│   ├── main.jsx             # React entry point
-│   └── index.css            # Global styles
-├── index.html               # App shell and SEO/social metadata
-├── package.json
-└── vite.config.js
+## 📂 Project Structure
+
+```
+giridirghraj/
+├── 🌐 frontend/               → Vite + React (→ Vercel)
+│   ├── public/
+│   │   ├── bg.jpeg            Wallpaper
+│   │   ├── drj1.jpg           Profile photo
+│   │   └── context.txt        Yug AI system prompt
+│   ├── src/components/
+│   │   ├── LockScreen.jsx     Liquid glass lockscreen
+│   │   ├── Desktop.jsx        Menu, dock, notifications, tutorial
+│   │   └── Window.jsx         All 12 app renderers
+│   ├── .env.example           → set VITE_API_BASE_URL
+│   └── package.json
+│
+├── ⚙️ backend/                → Express + Node.js (→ Render)
+│   ├── server.js              Chat + messages API
+│   ├── .env.example           → fill MONGODB_URI + GEMINI_API_KEY
+│   └── package.json
+│
+├── .gitignore                 Blocks all .env files
+└── README.md                  You are here!
 ```
 
-## Getting started
+---
+
+## 🚀 Local Development
 
 ### Prerequisites
+- Node.js 18+
+- MongoDB Atlas account (free tier)
+- Gemini API key — [get one free →](https://aistudio.google.com/apikey)
 
-- Node.js 20 or newer
-- npm 10 or newer
-
-### Installation
+### 1. Clone
 
 ```bash
 git clone https://github.com/drj7zz/giridirghraj.git
-cd giridirghraj/frontend
-npm install
-npm run dev
+cd giridirghraj
 ```
 
-Vite prints the local development URL in the terminal, usually `http://localhost:5173`.
+### 2. Backend
 
-## Available commands
+```bash
+cd backend
+cp .env.example .env          # fill in real values
+npm install
+node server.js
+# → Kaalyug backend listening on http://localhost:10000
+```
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run build` | Create an optimized production build in `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run lint` | Run Oxlint |
+### 3. Frontend
 
-## Customization
+```bash
+cd frontend
+cp .env.example .env.local
+# Set: VITE_API_BASE_URL=http://localhost:10000/api
+npm install
+npm run dev
+# → http://localhost:5173
+```
 
-- Update portfolio content and external links in `src/components/Window.jsx`.
-- Add or change desktop applications in the `apps` collection in `src/components/Desktop.jsx`.
-- Replace `public/drj.jpg` and `public/bg.jpeg` with your profile photograph and wallpaper.
-- Adjust color, glass, layout, and responsive styling in the matching CSS files under `src/`.
-- Update the metadata in `index.html` before deploying a personalized version.
+---
 
-## Metadata and discoverability
+## 🌐 Deployment
 
-The document head includes a clear page title, description, author and keyword metadata, theme color, Open Graph tags, Twitter Card tags, and Schema.org `Person` structured data. Before a public deployment, set an absolute production URL in the Open Graph image fields if your platform requires it.
+### Frontend → Vercel
 
-## Open source
+1. Connect GitHub repo to [vercel.com](https://vercel.com)
+2. Root directory: `frontend`
+3. Add env variable in Vercel dashboard:
 
-Kaalyug OS is an open-source portfolio project. You are welcome to study the implementation, fork it, adapt it for your own portfolio, and contribute improvements. Please retain appropriate attribution when reusing substantial parts of the project.
+```
+VITE_API_BASE_URL = https://YOUR_RENDER_BACKEND.onrender.com/api
+```
 
-## Contributing
+### Backend → Render
 
-Contributions are welcome.
+1. New **Web Service** on [render.com](https://render.com)
+2. Root directory: `backend`
+3. Start command: `node server.js`
+4. Environment variables:
 
-1. Fork the project.
-2. Create a focused branch: `git checkout -b feature/your-feature`.
-3. Make and test your changes with `npm run lint` and `npm run build`.
-4. Open a pull request that explains the change clearly.
+| Variable | Value |
+|---|---|
+| `PORT` | `10000` |
+| `MONGODB_URI` | `mongodb+srv://...` |
+| `MONGODB_DB` | `kaalyug` |
+| `FRONTEND_ORIGIN` | `https://your-project.vercel.app` |
+| `GEMINI_API_KEY` | Your Gemini key |
 
-For bugs or feature suggestions, open an issue on the repository or contact the maintainer.
+---
 
-## Contact
+## 🔒 Security
 
-- GitHub: [@drj7zz](https://github.com/drj7zz)
-- Instagram: [@drj7zz](https://www.instagram.com/drj7zz)
-- Email: [giridirghraj@gmail.com](mailto:giridirghraj@gmail.com)
+- ✅ All secrets in environment variables — never hardcoded
+- ✅ `.gitignore` blocks all `*.env*` except `.env.example`
+- ✅ CORS restricted to `FRONTEND_ORIGIN` in production
+- ✅ JSON body limit: 20kb per request
+- ✅ Old credentials invalidated and credentials file deleted
+- ✅ No MongoDB driver in frontend bundle
 
-## License
+---
 
-[MIT](LICENSE) © Dirghraj Giri.
+## 🛠️ Tech Stack
+
+**Frontend** · React 19, Vite 8, react-rnd, react-markdown, Lucide icons, Vanilla CSS
+
+**Backend** · Node.js, Express, MongoDB Atlas, `@google/generative-ai`
+
+**Hosting** · Vercel (frontend) · Render (backend) · MongoDB Atlas (DB) · Google AI Studio (AI)
+
+---
+
+## 📬 Contact
+
+**Dirghraj Giri** · Madhesh, Nepal
+
+[![Email](https://img.shields.io/badge/Email-giridirghraj%40gmail.com-red?logo=gmail&style=flat-square)](mailto:giridirghraj@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-drj7zz-181717?logo=github&style=flat-square)](https://github.com/drj7zz)
+[![Instagram](https://img.shields.io/badge/Instagram-@drj7zz-E1306C?logo=instagram&style=flat-square)](https://www.instagram.com/drj7zz)
+
+---
