@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import './Window.css';
-import { X, Minus, Plus, ExternalLink, MapPin, Briefcase, Award, User, HelpCircle, MessageSquare, ShieldCheck, Clock, Code } from 'lucide-react';
+import { X, Minus, Plus, ExternalLink, MapPin, Briefcase, Award, User, HelpCircle, MessageSquare, ShieldCheck, Clock, Code, Globe, Folder, FolderOpen, Grid2X2, ChevronLeft, Terminal as TerminalIcon, ArrowRight, Mail, Settings } from 'lucide-react';
 
 // Custom SVG Icons for GitHub, Instagram, and Gmail
 const GithubIcon = () => (
@@ -22,11 +22,33 @@ const GmailIcon = () => (
   </svg>
 );
 
-const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, theme, setTheme }) => {
+const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, theme, setTheme, onOpenApp }) => {
   const isMobile = window.innerWidth <= 768;
   const desktopWidth = Math.min(640, window.innerWidth - 48);
   const desktopHeight = Math.min(480, window.innerHeight - 76);
   const [isFullScreen, setIsFullScreen] = useState(isMobile);
+  const [browserUrl, setBrowserUrl] = useState('https://github.com/drj7zz');
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalOutput, setTerminalOutput] = useState(['Kaalyug Terminal v0.1.1', 'Type "help" to see available commands.']);
+  const [finderQuery, setFinderQuery] = useState('');
+  const [finderDirectory, setFinderDirectory] = useState('Root');
+  const [aiMessages, setAiMessages] = useState([{ role: 'ai', text: 'Hi, I’m Yug AI. Ask me about Dirghraj, his projects, skills, or contact details.' }]);
+  const [aiContext, setAiContext] = useState('');
+  const [messageUser, setMessageUser] = useState(localStorage.getItem('kaalyug_message_user') || '');
+  const [messageText, setMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [githubStats, setGithubStats] = useState(null);
+  const [githubRepos, setGithubRepos] = useState([]);
+
+  useEffect(() => {
+    if (app.id !== 'yug_ai') return;
+    fetch('/context.txt').then(response => response.ok ? response.text() : '').then(setAiContext).catch(() => setAiContext('Portfolio context is currently unavailable.'));
+  }, [app.id]);
+
+  useEffect(() => {
+    if (app.id !== 'analytics') return;
+    Promise.all([fetch('https://api.github.com/users/drj7zz').then(r => r.ok ? r.json() : null), fetch('https://api.github.com/users/drj7zz/repos?sort=updated&per_page=6').then(r => r.ok ? r.json() : [])]).then(([profile, repos]) => { setGithubStats(profile); setGithubRepos(Array.isArray(repos) ? repos : []); }).catch(() => { setGithubStats(null); setGithubRepos([]); });
+  }, [app.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -51,6 +73,7 @@ const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, them
       case 'basic_info':
         return (
           <div className="portfolio-content profile-page">
+            <form className="contact-form" onSubmit={(e) => { e.preventDefault(); e.currentTarget.reset(); alert('Thanks! Your message is ready to send via email.'); }}><input required name="name" placeholder="Your name" /><input required type="email" name="email" placeholder="Your email" /><textarea required name="message" placeholder="Your message" rows="4" /><button type="submit">Send message</button></form>
             <div className="profile-header-card">
               <img src="/drj1.jpg" alt="Dirghraj Giri" className="profile-avatar-large" loading="eager" decoding="sync" />
               <div className="profile-header-info">
@@ -196,6 +219,7 @@ const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, them
         return (
           <div className="portfolio-content contact-page">
             <h2 className="section-title">Contact Dirghraj Giri</h2>
+            <form className="contact-form" onSubmit={(e) => { e.preventDefault(); e.currentTarget.reset(); alert('Thanks! Your message is ready to send via email.'); }}><input required name="name" placeholder="Your name" /><input required type="email" name="email" placeholder="Your email" /><textarea required name="message" placeholder="Your message" rows="4" /><button type="submit">Send message</button></form>
             <div className="info-card">
               <p style={{ marginBottom: '16px' }}>Feel free to reach out for collaborations, projects, or inquiries:</p>
               
@@ -292,6 +316,62 @@ const Window = ({ app, isActive, onFocus, onClose, onMinimize, isMinimized, them
             </div>
           </div>
         );
+
+      case 'browser':
+        return (
+          <div className="utility-app browser-app">
+            <form className="browser-toolbar" onSubmit={(e) => { e.preventDefault(); const value = e.currentTarget.elements.url.value.trim(); setBrowserUrl(value.startsWith('http://') || value.startsWith('https://') ? value : `https://${value}`); }}>
+              <Globe size={17} />
+              <input name="url" value={browserUrl} onChange={(e) => setBrowserUrl(e.target.value)} aria-label="Browser URL" />
+              <button type="submit"><ArrowRight size={16} /></button>
+            </form>
+            <iframe className="browser-frame" src={browserUrl} title="Kaalyug Browser" />
+            <div className="browser-note">Some sites block embedded browsing. Use the button if the page is unavailable.</div>
+            <button className="browser-open-button" onClick={() => window.open(browserUrl, '_blank', 'noopener,noreferrer')}>Open in new tab</button>
+          </div>
+        );
+
+      case 'terminal':
+        return (
+          <div className="utility-app terminal-app">
+            <div className="terminal-output">{terminalOutput.map((line, index) => <div key={`${line}-${index}`}>{line}</div>)}</div>
+            <form className="terminal-form" onSubmit={(e) => {
+              e.preventDefault();
+              const command = terminalInput.trim();
+              if (!command) return;
+              const result = command === 'help' ? 'Commands: help, about, projects, contact, open browser, open finder, date, clear, matrix, neofetch' : command === 'matrix' ? 'Wake up, portfolio... The Matrix has you.' : command === 'neofetch' ? 'Kaalyug OS | React | v0.1.1 | Madhesh, Nepal' : command === 'about' ? 'Yug AI: Ask me anything about Dirghraj, his skills, projects, or contact details.' : command === 'projects' ? 'YugCoin Wallet | Review & Compliance Platform | Financial Tracker' : command === 'contact' ? 'giridirghraj@gmail.com' : command === 'date' ? new Date().toString() : command === 'clear' ? '' : command.startsWith('open ') ? `Opening ${command.slice(5)}...` : `Command not found: ${command}`;
+              setTerminalOutput(prev => command === 'clear' ? [] : [...prev, `guest@kaalyug:~$ ${command}`, result]);
+              setTerminalInput('');
+            }}>
+              <span>guest@kaalyug:~$</span><input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} autoFocus aria-label="Terminal command" />
+            </form>
+          </div>
+        );
+
+      case 'analytics':
+        return <div className="utility-app analytics-app"><h2>GitHub Analytics</h2><p>Live public profile data for <b>drj7zz</b>.</p><div className="analytics-card">{githubStats ? <><b>{githubStats.name || 'Dirghraj Giri'}</b><span>Repositories: {githubStats.public_repos}</span><span>Followers: {githubStats.followers}</span><span>Following: {githubStats.following}</span></> : <span>Loading GitHub stats or API unavailable.</span>}</div><div className="repo-list">{githubRepos.map(repo => <a key={repo.id} href={repo.html_url} target="_blank" rel="noreferrer"><b>{repo.name}</b><span>{repo.description || 'No description available.'}</span><small>★ {repo.stargazers_count} · Updated {new Date(repo.updated_at).toLocaleDateString()}</small></a>)}</div><button className="browser-open-button" onClick={() => window.open('https://github.com/drj7zz', '_blank', 'noopener,noreferrer')}>Open GitHub profile</button></div>;
+
+      case 'messages':
+        return <div className="utility-app messages-app"><h2>Messages</h2>{!messageUser ? <form className="message-login" onSubmit={(e) => { e.preventDefault(); const name = e.currentTarget.elements.username.value.trim(); if (name) { localStorage.setItem('kaalyug_message_user', name); setMessageUser(name); } }}><p>Sign in with a username to continue.</p><input name="username" required minLength="2" placeholder="Username" /><button type="submit">Continue</button></form> : <><p className="message-user">Signed in as <b>{messageUser}</b></p><div className="message-list">{messages.map((msg, i) => <div key={i} className="message-bubble"><b>{msg.user}</b><span>{msg.text}</span></div>)}</div><form className="message-compose" onSubmit={async (e) => { e.preventDefault(); if (!messageText.trim()) return; const msg = { user: messageUser, text: messageText.trim() }; setMessages(prev => [...prev, msg]); setMessageText(''); const api = import.meta.env.VITE_API_BASE_URL; if (api) fetch(`${api}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) }).catch(() => {}); }}><input value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder="Write a message..." /><button type="submit">Send</button></form></>}</div>;
+
+      case 'finder':
+        const finderItems = ['About Me', 'Projects', 'Contact', 'Settings', 'Browser', 'Terminal', 'Yug AI'];
+        return (
+          <div className="utility-app finder-app">
+            <div className="finder-toolbar"><FolderOpen size={18} /> <b>Finder</b><span className="finder-path">Kaalyug OS / Applications</span><input className="finder-search" placeholder="Search" value={finderQuery} onChange={(e) => setFinderQuery(e.target.value)} /></div>
+            <div className="finder-layout"><aside className="finder-sidebar"><b>Favorites</b>{['Applications', 'Desktop', 'Documents', 'Downloads', 'Pictures'].map(item => <button key={item} onClick={() => setFinderQuery(item === 'Applications' ? '' : item)}><Folder size={16} />{item}</button>)}</aside><div className="finder-table"><div className="finder-table-head"><span>Name</span><span>Kind</span><span>Size</span></div>
+              {finderItems.filter(item => item.toLowerCase().includes(finderQuery.toLowerCase())).map(item => { const id = { 'About Me': 'basic_info', Projects: 'projects', Contact: 'contact', Settings: 'settings', Browser: 'browser', Terminal: 'terminal', 'Yug AI': 'yug_ai' }[item]; const Icon = { basic_info: User, projects: Briefcase, contact: Mail, settings: Settings, browser: Globe, terminal: TerminalIcon, yug_ai: MessageSquare }[id]; return <button key={item} className="finder-file-row" onClick={() => onOpenApp?.({ id, title: item })}><span><Icon size={18} /><b>{item}</b></span><span>Application</span><span>—</span></button>; })}</div></div>
+          </div>
+        );
+
+      case 'yug_ai':
+        return (
+          <div className="utility-app ai-app"><h2>Yug AI</h2><div className="ai-messages">{aiMessages.map((message, index) => <div key={index} className={`ai-message ${message.role}`}>{message.text}</div>)}</div><form className="ai-form" onSubmit={(e) => { e.preventDefault(); const input = e.currentTarget.elements.question; const question = input.value.trim(); if (!question) return; const lower = question.toLowerCase(); const answer = lower.includes('project') ? (aiContext.match(/PROJECTS: (.*)/)?.[1] || 'Project information is unavailable.') : lower.includes('skill') ? (aiContext.match(/SKILLS: (.*)/)?.[1] || 'Skills information is unavailable.') : lower.includes('contact') || lower.includes('email') ? (aiContext.match(/EMAIL: (.*)/)?.[1] || 'Contact information is unavailable.') : `I’m Yug AI. I can answer from the loaded portfolio context:\n\n${aiContext || 'Loading context...'}`; setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'ai', text: answer }]); input.value = ''; }}><input name="question" placeholder="Ask Yug AI..." /><button type="submit"><ArrowRight size={16} /></button></form></div>
+        );
+
+      case 'applications':
+        return <div className="utility-app applications-app"><div className="finder-toolbar"><Grid2X2 size={18} /><b>Applications</b></div><div className="application-drawer-grid">{['About Me', 'Projects', 'Contact', 'Settings', 'Browser', 'Terminal', 'Yug AI'].map(item => { const id = { 'About Me': 'basic_info', Projects: 'projects', Contact: 'contact', Settings: 'settings', Browser: 'browser', Terminal: 'terminal', 'Yug AI': 'yug_ai' }[item]; const Icon = { basic_info: User, projects: Briefcase, contact: Mail, settings: Settings, browser: Globe, terminal: TerminalIcon, yug_ai: MessageSquare }[id]; return <button key={item} className="application-drawer-item" onClick={() => onOpenApp?.({ id, title: item })}><span className={`application-drawer-icon icon-${id}`}><Icon size={28} /></span><span>{item}</span></button>; })}</div></div>;
+
 
       default:
         return <div>Content</div>;

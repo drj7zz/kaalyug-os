@@ -42,6 +42,7 @@
 .mobile-app-grid {
   display: none;
 }
+.mobile-only-dock-item { display: none; }
 
 .apple-logo-img {
   display: flex;
@@ -107,12 +108,13 @@
   flex: 1;
   position: relative;
   padding: 20px;
+  padding-bottom: 92px;
   min-height: 0;
 }
 
 /* Desktop Icons: Clean Icon Pop-up Effect without glow */
 .desktop-icons {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 24px;
   width: 100px;
@@ -175,6 +177,9 @@
 
 .dock {
   display: flex;
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
   gap: 12px;
   padding: 8px 12px;
   border-radius: 20px;
@@ -184,6 +189,8 @@
   -webkit-backdrop-filter: var(--glass-blur);
 }
 
+.dock::-webkit-scrollbar { display: none; }
+
 .dock-item {
   display: flex;
   flex-direction: column;
@@ -191,11 +198,13 @@
   gap: 4px;
   cursor: pointer;
   position: relative;
+  flex: 0 0 auto;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .dock-item:hover {
-  transform: scale(1.2) translateY(-8px);
+  transform: scale(1.08) translateY(-4px);
 }
 
 .dock-icon {
@@ -233,6 +242,7 @@
 }
 
 .spotlight-container {
+  position: relative;
   display: flex;
   align-items: center;
   width: 500px;
@@ -262,6 +272,16 @@
   outline: none;
   font-family: inherit;
 }
+.search-results { position: absolute; top: calc(100% + 8px); left: 0; right: 0; display: flex; flex-direction: column; gap: 4px; padding: 7px; border-radius: 10px; background: var(--window-solid-bg); border: 1px solid var(--glass-border); }
+.search-results button { display: flex; align-items: center; gap: 10px; padding: 9px; border: 0; border-radius: 7px; color: var(--text-primary); background: transparent; text-align: left; cursor: pointer; }
+.search-results button:hover { background: var(--glass-header); }
+.search-results .web-search-result { border-top: 1px solid var(--glass-border); margin-top: 4px; color: var(--accent); }
+.search-empty { padding: 9px; color: var(--text-muted); }
+.notification-center { position: absolute; top: 12px; right: 16px; z-index: 9600; width: min(300px, calc(100vw - 32px)); padding: 16px; border-radius: 14px; color: var(--text-primary); background: var(--window-solid-bg); border: 1px solid var(--glass-border); box-shadow: 0 14px 40px rgba(0,0,0,.35); }
+.notification-center p { margin: 10px 0 0; color: var(--text-secondary); font-size: 13px; }
+.tutorial-overlay { position: absolute; inset: 0; z-index: 9700; display: grid; place-items: center; background: rgba(0,0,0,.35); }
+.tutorial-card { width: min(380px, calc(100vw - 32px)); padding: 22px; border-radius: 16px; background: var(--window-solid-bg); color: var(--text-primary); }
+.tutorial-card button { border: 0; border-radius: 9px; padding: 9px 16px; background: var(--accent); color: #fff; cursor: pointer; }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
@@ -310,6 +330,9 @@
     background: rgba(255, 255, 255, 0.16);
     cursor: pointer;
   }
+
+  .mobile-only-dock-item { display: flex; }
+  .dock-item.mobile-optional:not(.is-open) { display: none; }
 
   .dynamic-island {
     position: absolute;
@@ -401,7 +424,7 @@
   }
   
   .dock-item:hover {
-    transform: scale(1.1) translateY(-5px);
+    transform: scale(1.04) translateY(-2px);
   }
   
   .spotlight-container {
